@@ -1,0 +1,42 @@
+
+TITLE: "Trajectory modelling of depression scores"
+DATA: FILE = b4_NOTign.csv;
+VARIABLE:
+NAMES = depm0-depm5 deps0-deps5 sex fam_id site_id rid;
+
+USEVARIABLES = deps0-deps5 fam_id site_id rid;
+AUXILIARY = rid;
+CLASSES = class (3);
+CLUSTER = fam_id;
+STRATIFICATION = site_id;
+MISSING = ALL (999999);
+  
+ANALYSIS: 
+TYPE = TWOLEVEL COMPLEX RANDOM MIXTURE;
+STARTS = 1000 100;
+STITERATIONS = 50;
+PROCESSORS = 2;
+  
+MODEL:
+%WITHIN%
+%OVERALL%
+intw slopew | deps0@0 deps1@1 deps2@2 deps3@3 deps4@4 deps5@5;
+slopew@0
+
+
+%BETWEEN%
+%OVERALL%
+intb slopeb | deps0@0 deps1@1 deps2@2 deps3@3 deps4@4 deps5@5;
+slopeb@0
+
+            
+OUTPUT: TECH10;
+SAMPSTAT STANDARDIZED CINTERVAL (BOOTSTRAP) MOD TECH11 TECH13 TECH4 TECH14; 
+
+PLOT: 
+SERIES = deps0(1) deps1(2) deps2(3) deps3(4) deps4(5) deps5(6);
+TYPE = PLOT3
+
+SAVEDATA: 
+FILE = 4bins_postC_3_classes_no_covar_random_int_deps05_NOTign_121724.dat;
+SAVE = CPROBABILITIES;
